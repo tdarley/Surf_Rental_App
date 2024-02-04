@@ -51,8 +51,8 @@ String? boardName = selectedBoard?.contains("_") ?? false
           appBar: AppBar(
           actions: <Widget>[
             IconButton(
-              icon: const Icon(Icons.stop),
-              tooltip: 'Login',
+              icon: const Icon(Icons.home),
+              tooltip: 'Home',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -209,8 +209,8 @@ String? boardName = selectedBoard?.contains("_") ?? false
       
                                   myAppState.updateStringSelection(selectedBoard.toString());
       
-                                      // Navigate to a new page using Navigator
-                                  Navigator.push(
+                                  // Navigate to a new page using Navigator
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(builder: (context) {
                                       return StartRental(); // Replace YourNewPage with the actual page you want to navigate to

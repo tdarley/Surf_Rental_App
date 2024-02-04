@@ -9,6 +9,7 @@ import 'Confirmation_Page.dart';
 import 'state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
 class QRViewExample extends StatefulWidget {
   const QRViewExample({Key? key}) : super(key: key);
 
@@ -61,8 +62,8 @@ class _QRViewExampleState extends State<QRViewExample> {
         appBar: AppBar(
           actions: <Widget>[
             IconButton(
-              icon: const Icon(Icons.login),
-              tooltip: 'Login',
+              icon: const Icon(Icons.home),
+              tooltip: 'Home',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -257,7 +258,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
 
         // waut for the page to be loaded
-        dynamic pop = await Navigator.push(
+        dynamic pop = await Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) {
             

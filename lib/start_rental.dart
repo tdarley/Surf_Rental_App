@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:surf_app_2/main.dart';
 import 'firebase_options.dart';
 import 'login_page.dart';
 import 'dart:async';
@@ -12,6 +13,7 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:typed_data';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 ///Page intiates:
 ///1)  connection to the ardrino.
@@ -47,6 +49,10 @@ class _StartRentalState extends State<StartRental> {
  // SATE OF THE UNLOCKING PROGRESS
   bool _isUnlocking = false;
 
+ 
+
+
+
 
   @override
   void initState() {
@@ -60,12 +66,14 @@ class _StartRentalState extends State<StartRental> {
         backgroundColor: Color.fromARGB(255, 227, 230, 207),
         
         appBar:AppBar(
+          automaticallyImplyLeading: false,
           actions: <Widget>[
+            if(myAppState.getboardUnlockingInProgress() == false)
             IconButton(
-              icon: const Icon(Icons.stop),
-              tooltip: 'Login',
+              icon: const Icon(Icons.home),
+              tooltip: 'Home',
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => Placeholder()),
                 );
@@ -135,7 +143,13 @@ class _ScanButtonState extends State<ScanButton> with SingleTickerProviderStateM
  // SATE OF THE UNLOCKING PROGRESS
   bool _isUnlocking = false;
 
+  bool _isOnline = false; 
+
   late AnimationController _controller;
+
+  
+
+
 
 
 
@@ -317,201 +331,268 @@ Future<void> addSession(String email, String location, String boardId, String st
   });
 }
 
+Future<void> checkOnline()async {
+
+   final connectivityResult = await (Connectivity().checkConnectivity());
+
+       if (connectivityResult == ConnectivityResult.mobile) {
+      // I am connected to a mobile network.
+        _isOnline = true;
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      // I am connected to a wifi network.
+       _isOnline = true;
+    } else if (connectivityResult == ConnectivityResult.ethernet) {
+      // I am connected to a ethernet network.
+       _isOnline = true;
+    } else if (connectivityResult == ConnectivityResult.vpn) {
+       _isOnline = true;
+      // I am connected to a vpn network.
+      // Note for iOS and macOS:
+      // There is no separate network interface type for [vpn].
+      // It returns [other] on any device (also simulator)
+    }  else if (connectivityResult == ConnectivityResult.other) {
+        _isOnline = false ;
+      // I am connected to a network which is not in the above mentioned networks.
+    } else if (connectivityResult == ConnectivityResult.none) {
+         _isOnline = false;
+      // I am not connected to any network.
+    }
+
+
+
+
+}
   @override
   Widget build(BuildContext context) {
     return Consumer<MyAppState> (
        builder: (context, myAppState, child) =>
-      Column(
-        children: [
-          
-          if (_isUnlocking == false && isLocked==true)
-          InkWell(
-            onTap: () async{
-              // Add your scanning logic here
-              print('Scanning...');
-              await requestBluetoothPermission();
-              await requestBluetoothScanPermission();
-              await requestBluetoothConnectPermission();
-          
-              await _connectAndUnlock();
-      
-      
-          
-              // Load qr scanner page.
-              //Navigator.push(
-              //  context,
-              //  MaterialPageRoute(builder: (context) => QRViewExample()),
-              //);
-            },
-            child: Container(
-              width: 200.0,
-              height: 200.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Color.fromARGB(255, 38, 99, 2),
-                  width: 3.0,
-                ),
-                color: const Color.fromARGB(255, 78, 176, 39),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Stack(
-                    children: [
-                      for (int i = 0; i < 3; i++) _buildPulseRing(i * 0.3, context),
-                      Center(
-                        child: Text(
-                          'Start Session',
-                          style: TextStyle(
-                            color: Colors.black38,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-      
-           if (_isUnlocking)
-                InkWell(
-            onTap: () async{
-             
-            },
-            child: Container(
-              width: 200.0,
-              height: 200.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Color.fromARGB(255, 255, 196, 1),
-                  width: 3.0,
-                ),
-                color: Color.fromARGB(255, 255, 217, 0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Stack(
-                    children: [
-                      for (int i = 0; i < 3; i++) _buildPulseRing2(i * 0.3, context),
-                      Center(
-                        child: Text(
-                          'Unlocking',
-                          style: TextStyle(
-                            color: Colors.black38,
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-      
-          if (_isUnlocking == false && isLocked==false)
-          InkWell(
-            onTap: () async{
 
-            var state_call_for_qr_string = myAppState.getBoardSelection();
-             
-            String? boardName = state_call_for_qr_string.contains("_") ?? false
-                ? state_call_for_qr_string.split('_')[0] + state_call_for_qr_string.split('_')[1]
-                : null;
+            Column(
+                      
+                        
+                        children: [
+            if (_isUnlocking == false && isLocked==true)
 
-
-              String? location = state_call_for_qr_string.contains(".")
-                  ?? false
-                  ? state_call_for_qr_string.split('_')[2].split('.')[0]
-                  : null;
-
-              
-      
-              await addSession( myAppState.getEmailAdress(), location!, boardName!, '00:00:00', '00:00:00');
-
-             
-            },
-            child: Container(
-              width: 200.0,
-              height: 200.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Color.fromARGB(255, 1, 141, 255),
-                  width: 3.0,
-                ),
-                color: Color.fromARGB(255, 38, 0, 255),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    spreadRadius: 3,
-                    blurRadius: 10,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: AnimatedBuilder(
-                animation: _controller,
-                builder: (context, child) {
-                  return Stack(
-                    children: [
-                      for (int i = 0; i < 3; i++) _buildPulseRing3(i * 0.3, context),
-                      Center(
-                        child: Text(
-                          'Take Board',
-                          style: TextStyle(
-                            color: Color.fromARGB(255, 250, 249, 249),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-          
-          
-      
             
+
+            InkWell(
+              onTap: myAppState.getboardUnlockingInProgress()
+                      ? null
+                      : () async {
+
+                         myAppState.setIsUnlockingInProgress(true);
+                      
+                       
+                         
+                
+
+
+                // Add your scanning logic here
+                print('Scanning...');
+                await checkOnline();
+                    
+                if (_isOnline == true){
+                    
+                await requestBluetoothPermission();
+                await requestBluetoothScanPermission();
+                await requestBluetoothConnectPermission();
+            
+                await _connectAndUnlock();
+
+                myAppState.setIsUnlockingInProgress(false);
+
+               
+
+                }else {
+                    
+                  // not online add warning message here!!!
+                    
+                  Navigator.pushReplacement(
+                      context,
+                        MaterialPageRoute(builder: (context) => MyHomePage(title: 'Rent-to-Surf')),
+                    );
+                    
+                }
+                      
+                      
+            
+                // Load qr scanner page.
+                //Navigator.push(
+                //  context,
+                //  MaterialPageRoute(builder: (context) => QRViewExample()),
+                //);
+              },
+              child: Container(
+                width: 200.0,
+                height: 200.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Color.fromARGB(255, 38, 99, 2),
+                    width: 3.0,
+                  ),
+                  color: const Color.fromARGB(255, 78, 176, 39),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 3,
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Stack(
+                      children: [
+                        for (int i = 0; i < 3; i++) _buildPulseRing(i * 0.3, context),
+                        Center(
+                          child: Text(
+                            'Start Session',
+                            style: TextStyle(
+                              color: Colors.black38,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+                      
+             if (_isUnlocking)
+                  InkWell(
+              onTap: () async{
+               
+              },
+              child: Container(
+                width: 200.0,
+                height: 200.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Color.fromARGB(255, 255, 196, 1),
+                    width: 3.0,
+                  ),
+                  color: Color.fromARGB(255, 255, 217, 0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 3,
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Stack(
+                      children: [
+                        for (int i = 0; i < 3; i++) _buildPulseRing2(i * 0.3, context),
+                        Center(
+                          child: Text(
+                            'Unlocking',
+                            style: TextStyle(
+                              color: Colors.black38,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+                      
+            if (_isUnlocking == false && isLocked==false)
+            InkWell(
+              onTap: () async{
+                      
+              var state_call_for_qr_string = myAppState.getBoardSelection();
+               
+              String? boardName = state_call_for_qr_string.contains("_") ?? false
+                  ? state_call_for_qr_string.split('_')[0] + state_call_for_qr_string.split('_')[1]
+                  : null;
+                      
+                      
+                String? location = state_call_for_qr_string.contains(".")
+                    ?? false
+                    ? state_call_for_qr_string.split('_')[2].split('.')[0]
+                    : null;
+                      
+                
+                      
+                await addSession( myAppState.getEmailAdress(), location!, boardName!, '00:00:00', '00:00:00');
+                      
+               
+              },
+              child: Container(
+                width: 200.0,
+                height: 200.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Color.fromARGB(255, 1, 141, 255),
+                    width: 3.0,
+                  ),
+                  color: Color.fromARGB(255, 38, 0, 255),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 3,
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return Stack(
+                      children: [
+                        for (int i = 0; i < 3; i++) _buildPulseRing3(i * 0.3, context),
+                        Center(
+                          child: Text(
+                            'Take Board',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 250, 249, 249),
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+            
+            
+                      
+              
+                      
+                      
+                      
+                      
+                      
+                        ],
+                      ),
       
-      
-      
-      
-      
-        ],
-      ),
     );
   }
 
   Widget _buildPulseRing(double delay, BuildContext context) {
     final double size = 200.0;
     final double maxOpacity = 0.4;
+   
 
     return 
     Positioned.fill(
@@ -608,6 +689,8 @@ Widget _buildPulseRing3(double delay, BuildContext context) {
       ),
     );
   }
+ 
+ 
   @override
   void dispose() {
     _controller.dispose();

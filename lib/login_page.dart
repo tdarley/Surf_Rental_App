@@ -91,8 +91,10 @@ class LoginScreen extends StatelessWidget {
 Widget build(BuildContext context) {
   return Consumer<MyAppState>(
     builder: (context, myAppState, child) => FlutterLogin(
-      title: 'ECORP',
-      logo: const AssetImage('assets/images/Logging_In.png'),
+     
+      //title: 'Welcome',
+      
+      //logo: const AssetImage('assets/images/Logging_In.png'),
       onLogin: _authUser,
       onSignup: _signupUser,
       onSubmitAnimationCompleted: () {
@@ -108,6 +110,34 @@ Widget build(BuildContext context) {
         ));
       },
       onRecoverPassword: _recoverPassword,
+      theme: LoginTheme(
+        primaryColor: Color.fromARGB(255, 55, 81, 167), // Customize primary color
+        accentColor: Colors.yellow, // Customize accent color
+        errorColor: Colors.red, // Customize error color
+        pageColorDark: Color.fromRGBO(38, 168, 162, 1), // Customize dark page color
+        pageColorLight: Color.fromARGB(255, 233, 175, 14), // Customize light page color
+        titleStyle: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 15
+       
+        ),cardTheme: CardTheme(
+          color: Color.fromARGB(248, 240, 240, 237), // Change the background color of the card
+          elevation: 5.0, // Customize elevation
+          margin: EdgeInsets.all(15.0), // Customize margin
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0), // Customize border radius
+          ),
+        ),
+        
+        ), 
+        
+        
+        
+        
+        
+        
+         // Customize title style
     ),
   );
 }}

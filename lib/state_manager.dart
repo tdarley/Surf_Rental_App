@@ -21,6 +21,9 @@ class MyAppState with ChangeNotifier {
   String _boardSelection = 'testing'; // Add a variable to store the string value
   String get boardSelection => _boardSelection; // Add a getter for the string value
 
+   bool _boardUnlockingInProgress = false; // Add a variable to store the string value
+   bool get boardUnlockingInProgress => _boardUnlockingInProgress; // Add a getter for the string value
+
 
 
   // Method for updating the loginStatus
@@ -47,6 +50,14 @@ class MyAppState with ChangeNotifier {
 
   }
 
+  // Method for updating the loginStatus
+   void setIsUnlockingInProgress(bool status) {
+    _boardUnlockingInProgress = status;
+    notifyListeners(); // Notify listeners about the change
+    print('User is attempting to unlock:$_boardUnlockingInProgress');
+   
+  }
+
   
   
   // Add this method to get the current board selection
@@ -62,8 +73,18 @@ class MyAppState with ChangeNotifier {
     return _emailAdress;
   }
 
-  // Method for retrieving the emailAdress
+   // Method for retrieving the emailAdress
+  bool getLoggedIn() {
+    print('Retrieving Current Email Adress: $_loggedIn');
+    return _loggedIn;
+  }
 
+ 
+ // Method for retrieving if the user is trying to unlock the wrack
+  bool getboardUnlockingInProgress() {
+    print('Retrieving boardUnlockingInProgress: $_boardUnlockingInProgress');
+    return _boardUnlockingInProgress;
+  }
 
 
 }
