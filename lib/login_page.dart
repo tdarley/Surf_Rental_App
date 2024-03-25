@@ -1,10 +1,9 @@
 import 'package:flutter_login/flutter_login.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:surf_app_2/main.dart';
-import 'main.dart';
 import 'package:provider/provider.dart';
 import 'state_manager.dart';
+import 'homepage.dart';
 
 class LoginScreen extends StatelessWidget {
    LoginScreen({super.key}); // was a const
@@ -31,7 +30,7 @@ class LoginScreen extends StatelessWidget {
       
     );
 
-   
+
       _setEmail = data.name ?? '';
       
     
@@ -111,33 +110,27 @@ Widget build(BuildContext context) {
       },
       onRecoverPassword: _recoverPassword,
       theme: LoginTheme(
-        primaryColor: Color.fromARGB(255, 55, 81, 167), // Customize primary color
-        accentColor: Colors.yellow, // Customize accent color
+        primaryColor: Color.fromARGB(255, 14, 34, 100), // Customize primary color
+        accentColor: Color.fromARGB(255, 233, 161, 4), // Customize accent color
         errorColor: Colors.red, // Customize error color
-        pageColorDark: Color.fromRGBO(38, 168, 162, 1), // Customize dark page color
-        pageColorLight: Color.fromARGB(255, 233, 175, 14), // Customize light page color
-        titleStyle: TextStyle(
+        pageColorDark: Color.fromRGBO(2, 253, 241, 1), // Customize dark page color
+        pageColorLight: Color.fromARGB(255, 1, 80, 73), // Customize light page color
+        titleStyle: const TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
           fontSize: 15
        
         ),cardTheme: CardTheme(
-          color: Color.fromARGB(248, 240, 240, 237), // Change the background color of the card
+          color: Color.fromARGB(248, 255, 255, 255), // Change the background color of the card
           elevation: 5.0, // Customize elevation
           margin: EdgeInsets.all(15.0), // Customize margin
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0), // Customize border radius
+            borderRadius: BorderRadius.circular(15.0), // Customize border radius
           ),
         ),
         
         ), 
-        
-        
-        
-        
-        
-        
-         // Customize title style
+
     ),
   );
 }}
